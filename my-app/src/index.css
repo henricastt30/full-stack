@@ -1,4 +1,15 @@
-:root {
+.form-group{
+  margin-top: 10px;
+  padding-left: 500px;
+  padding-right: 500px;
+}
+
+.submit{
+  margin-left: 500px;
+  margin-top: 10px;
+}
+
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -65,4 +76,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

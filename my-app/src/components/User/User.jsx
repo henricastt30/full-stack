@@ -1,5 +1,3 @@
-// Componente User
-
 const User = () => {
     return (
         <>
