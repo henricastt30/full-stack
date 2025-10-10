@@ -1,1 +1,1 @@
-# full-stack
+# projeto-fullstack-react-senai
