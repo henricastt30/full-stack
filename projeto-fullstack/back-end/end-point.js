@@ -106,8 +106,28 @@ app.post('/logs', async (req, res) => {
 
 app.get('/logs', async (req, res) => {
     try {
-        const [results] = await pool.query(
-            'SELECT * FROM lgs;'
+        const { query } = req;
+
+        const pagina = Number(query.pagina - 1)
+        const quantidade = Number(query.quantidade)
+        const offset = pagina * query.quantidade
+
+        const [results] = await pool.query(`
+            SELECT * FROM lgs LIMIT ?
+            OFFSET ?
+            `, [quantidade, offset]
+        );
+        res.status(200).send(results)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
+app.get('/logs/categorias', async (req, res) => {
+    try {
+            const [results] = await pool.query(
+            'SELECT distinct(categoria) FROM lgs'
         );
         res.status(200).send(results)
     }
