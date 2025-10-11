@@ -122,7 +122,7 @@ app.get('/logs', async (req, res) => {
     catch (error) {
         console.log(error)
     }
-})
+});
 
 app.get('/logs/categorias', async (req, res) => {
     try {
@@ -134,7 +134,30 @@ app.get('/logs/categorias', async (req, res) => {
     catch (error) {
         console.log(error)
     }
+});
+
+app.post('/likes', async (req, res) => {
+    const { body } = req;
+    const [results] = await pool.query(
+        'INSERT INTO likes(id_log, id_user) VALUES (?, ?)', [body.id_log, body.id_user]
+    )
+    const [likeCriado] = await pool.query(
+        'SELECT * FROM likes WHERE id = ?', results.insertId
+    )
+    res.status(201).json(likeCriado)
 })
+
+app.get('/likes', async (req, res) => {
+    try {
+        const [ results ] = await pool.query(
+            'SELECT * FROM likes'
+        );
+        res.status(200).send(results);
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {
