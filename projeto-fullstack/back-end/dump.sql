@@ -1,15 +1,25 @@
 CREATE DATABASE senai;
 USE senai;
 
-CREATE TABLE usuario (
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  nome VARCHAR(150) NOT NULL,
-  email VARCHAR(100) NOT NULL,
-  cpf VARCHAR(20) NOT NULL,
-  ativo INT NOT NULL,
-  data_cadastro DATETIME NOT NULL,
-  nivel INT NULL
+CREATE TABLE usuario(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    idade INT,
+    email VARCHAR(100) UNIQUE,
+    senha VARCHAR(100)
 );
+
+INSERT INTO usuario (nome, idade, email, senha) VALUES
+('Ana Costa', 25, 'ana.costa@example.com', 'senhaAna123'),
+('Bruno Lima', 32, 'bruno.lima@example.com', 'senhaBruno456'),
+('Carla Souza', 28, 'carla.souza@example.com', 'senhaCarla789'),
+('Diego Martins', 40, 'diego.martins@example.com', 'senhaDiego101'),
+('Elisa Rocha', 22, 'elisa.rocha@example.com', 'senhaElisa112'),
+('Felipe Alves', 35, 'felipe.alves@example.com', 'senhaFelipe131'),
+('Gabriela Pinto', 27, 'gabriela.pinto@example.com', 'senhaGabriela415'),
+('Henrique Dias', 30, 'henrique.dias@example.com', 'senhaHenrique161'),
+('Isabela Ferreira', 26, 'isabela.ferreira@example.com', 'senhaIsabela718'),
+('João Carvalho', 33, 'joao.carvalho@example.com', 'senhaJoao192');
 
 CREATE TABLE lgs(
 	id INT PRIMARY KEY AUTO_INCREMENT,
@@ -18,6 +28,23 @@ CREATE TABLE lgs(
     linha_de_codigo INT,
     bugs_corrigidos INT
 );
+
+CREATE TABLE likes(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    id_log INT,
+    FOREIGN KEY (id_log)
+    REFERENCES lgs(id),
+    id_user INT,
+    FOREIGN KEY (id_user)
+    REFERENCES usuario(id)
+);
+
+INSERT INTO likes(id_log, id_user) VALUES
+(1, 2),
+(3, 1),
+(2, 4);
+
+SELECT * FROM likes;
 
 INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES ('Desenvolvimento de Gameplay', 22, 1850, 2);
 INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES ('Arte e Design', 30, 45, 0);
@@ -818,3 +845,27 @@ INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos)
 INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES ('Sonoplastia', 9, 0, 0);
 INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES ('Roteiro e Narrativa', 24, 14, 0);
 INSERT INTO lgs (categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES ('Desenvolvimento de Gameplay', 39, 2550, 5);
+
+SELECT
+        lgs.id,
+        lgs.categoria,
+            lgs.horas_trabalhadas,
+            lgs.linha_de_codigo,
+            lgs.bugs_corrigidos,
+            COUNT(senai.likes.id_log) AS likes,
+            COUNT(senai.comment.id_log) AS qtd_comments
+        FROM
+        senai.lgs
+        LEFT JOIN senai.likes
+        ON senai.likes.id_log = senai.lgs.id
+        LEFT JOIN senai.comment
+        ON senai.comment.id_log = senai.lgs.id
+        GROUP BY
+        lgs.id,
+            lgs.categoria,
+            lgs.horas_trabalhadas,
+            lgs.linha_de_codigo,
+            lgs.bugs_corrigidos
+        ORDER BY senai.lgs.id asc
+        LIMIT ?
+        OFFSET ?;
