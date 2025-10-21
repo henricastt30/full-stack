@@ -1,7 +1,7 @@
 CREATE DATABASE senai;
 USE senai;
 
-CREATE TABLE usuario(
+CREATE TABLE usuario(4
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100),
     idade INT,

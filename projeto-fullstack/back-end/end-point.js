@@ -62,7 +62,8 @@ app.delete("/usuarios/:id", async (req, res) => {
             id
         );
         res.status(200).send("Usuário deletado!", results);
-    } catch (error) {
+    }
+    catch (error) {
         console.log(error);
     }
 });
@@ -205,7 +206,7 @@ app.get('/likess', async (req, res) => {
     }
 })
 
-app.post('/likess', async (req, res) => {
+app.post('/likes', async (req, res) => {
     try {
         const { body } = req;
         const [results] = await pool.query(
@@ -216,6 +217,23 @@ app.post('/likess', async (req, res) => {
         )
         res.status(201).json(likesCriado)
     } catch (error) {
+        console.log(error)
+    }
+});
+
+app.delete('/likes', async (req, res) => {
+    try {
+        const { query } = req;
+        const id_log = Number(query.id_log);
+        const id_user = Number(query.id_user);
+        const [results] = await pool.query(`
+            DELETE FROM likes WHERE id_log=? AND id_user=?
+            `,
+        [id_log, id_user]
+        )
+        res.status(200).send("Like retirado com sucesso", results)
+    }
+    catch (error) {
         console.log(error)
     }
 })
