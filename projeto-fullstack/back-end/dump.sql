@@ -1,7 +1,7 @@
 CREATE DATABASE senai;
 USE senai;
 
-CREATE TABLE usuario(4
+CREATE TABLE usuario(
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100),
     idade INT,
@@ -26,12 +26,26 @@ CREATE TABLE lgs(
 	categoria TEXT,
     horas_trabalhadas INT,
     linha_de_codigo INT,
-    bugs_corrigidos INT
+    bugs_corrigidos INT,
+    id_user INT,
+    FOREIGN KEY (id_user)
+    REFERENCES usuario(id)
 );
 
 CREATE TABLE likes(
 	id INT PRIMARY KEY AUTO_INCREMENT,
     id_log INT,
+    FOREIGN KEY (id_log)
+    REFERENCES lgs(id),
+    id_user INT,
+    FOREIGN KEY (id_user)
+    REFERENCES usuario(id)
+);
+
+CREATE TABLE `comment` (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    message VARCHAR(255),
+	id_log INT,
     FOREIGN KEY (id_log)
     REFERENCES lgs(id),
     id_user INT,

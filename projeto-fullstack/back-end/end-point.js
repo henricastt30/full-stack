@@ -133,29 +133,11 @@ app.get("/logs", async (req, res) => {
 
     const [results] = await pool.query(
         `
-        SELECT
-        lgs.id,
-        lgs.categoria,
-            lgs.horas_trabalhadas,
-            lgs.linha_de_codigo,
-            lgs.bugs_corrigidos,
-            COUNT(senai.likes.id_log) AS likes,
-            COUNT(senai.comment.id_log) AS qtd_comments
-        FROM
-        senai.lgs
+        SELECT lgs.id, lgs.categoria, lgs.horas_trabalhadas, lgs.linha_de_codigo, lgs.bugs_corrigidos, lgs.id_user, (senai.likes.id_log) AS quantidade_likes FROM lgs 
         LEFT JOIN senai.likes
         ON senai.likes.id_log = senai.lgs.id
-        LEFT JOIN senai.comment
-        ON senai.comment.id_log = senai.lgs.id
-        GROUP BY
-        lgs.id,
-            lgs.categoria,
-            lgs.horas_trabalhadas,
-            lgs.linha_de_codigo,
-            lgs.bugs_corrigidos
-        ORDER BY senai.lgs.id asc
-        LIMIT ?
-        OFFSET ?;
+        GROUP BY lgs.id, lgs.categoria, lgs.horas_trabalhadas, lgs.linha_de_codigo, lgs.bugs_corrigidos, lgs.id_user
+        ORDER BY senai.lgs.id ASC;
         `,
         [quantidade, offset]);
     res.send(results);
@@ -176,12 +158,13 @@ app.post("/logs", async (req, res) => {
     try {
         const { body } = req;
         const [results] = await pool.query(
-            "INSERT INTO lgs(categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?)",
+            "INSERT INTO lgs(categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos, id_user) VALUES (?, ?, ?, ?, ?)",
             [
                 body.categoria,
                 body.horas_trabalhadas,
                 body.linha_de_codigo,
                 body.bugs_corrigidos,
+                body.id_user,
             ]
         );
         const [logCriado] = await pool.query(
