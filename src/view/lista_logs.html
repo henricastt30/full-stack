@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Log</title>
+
+    <link rel="stylesheet" href="../style/style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js" integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    
+    <div class="container">
+        <!-- <ul class="list-group">
+            <li class="list-group-item">
+
+            </li>
+            <li class="list-group-item">
+
+            </li>
+            <li class="list-group-item">
+
+            </li>
+            <li class="list-group-item">
+
+            </li>
+            <li class="list-group-item">
+
+            </li>
+          </ul> -->
+    </div>
+    <div id="categoria"></div>
+    <div class="pagination d-flex justify-content-around">
+        <button type="button" class="btn btn-outline-primary" id="antecessor"><</button>
+        <button type="button" class="btn btn-outline-primary" id="sucessor">></button>
+    </div>
+</body>
+<script>
+
+    const url = "http://localhost:3000/logs?pagina=1&quantidade=10"
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+    })
+    .then((res) => {
+        if(!res.ok)
+            console.log("teste: ", res)
+        return res.json();
+    }).then((data) => {
+        if(data)
+            console.log("teste: ", data)
+
+        let categoriasHTML = "";
+        if(data && Array.isArray(data)){
+            for (let index = 0; index < data.length; index++){
+                const element = data[index];
+                console.log(element.categoria);
+                categoriasHTML += `<div style="border-radius: 4px; border: 1px #cacaca solid; padding: 20px;">
+                    Categoria: ${element.categoria} <br>
+                    <div style="display: flex; justify-content: column;">
+                        Horas Trabalhadas ${element.horas_trabalhadas}
+                        Linhas Totais de Código ${element.linhas_codigo}
+                        Bugs Corrigidos ${element.bugs_corrigidos}
+                    </div>
+                    </div>`;
+            }
+        }
+        document.getElementById("categoria").innerHTML = categoriasHTML;
+    })
+    .catch((error) => console.log("ERROR: ", error))
+
+</script>
+</html>
