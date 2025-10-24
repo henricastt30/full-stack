@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../style/style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js" integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+    <div id="metricas"></div>
+</body>
+
+<script>
+
+    const url = "http://localhost:3000/metricas-usuario/1"
+    fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+    })
+    .then((res) => {
+        if(!res.ok)
+            console.log("teste: ", res)
+        return res.json();
+    }).then((data) => {
+        if(data)
+            console.log("teste: ", data)
+
+        let metricasHTML = "";
+        if(data && Array.isArray(data)){
+            for (let index = 0; index < data.length; index++){
+                const element = data[index];
+                console.log(element.nome);
+                metricasHTML += `<div style="border-radius: 4px; border: 1px #cacaca solid; padding: 20px;">
+                    Dados do Usuário: ${element.nome} <br>
+                    <div style="display: flex; justify-content: column;">
+                        Horas Totais ${element.horas_totais} <br>
+                        Bugs Totais ${element.bugs_totais} <br>
+                        Logs Totais ${element.logs_totais} <br>
+                    </div>
+                    </div>`;
+            }
+        }
+        document.getElementById("metricas").innerHTML = metricasHTML;
+    })
+    .catch((error) => console.log("ERROR: ", error))
+
+</script>
+
+</html>

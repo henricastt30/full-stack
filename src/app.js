@@ -77,12 +77,30 @@ app.put("/usuarios/:id", async (req, res) => {
   }
 });
 
+app.get("/metricas-usuario/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [results] = await pool.query(
+      `
+      SELECT sum(horas_trabalhadas) AS horas_totais, count(lgs.id) AS logs_totais, sum(bugs_corrigidos) AS bugs_totais, nome FROM lgs
+      JOIN usuario
+      ON lgs.id_user = usuario.id
+      WHERE id_user = ?;
+      `, id
+    )
+    res.status(200).send(results)
+  }
+  catch (error) {
+    console.log(error)
+  }
+})
+
 // REGISTRO E LOGIN
 app.post("/registrar", async (req, res) => {
   try {
     const { body } = req;
     const [results] = await pool.query(
-      "INSERT INTO usuario (nome,idade, email, senha) VALUES (?,?,?,?)",
+      "INSERT INTO usuario (nome, idade, email, senha) VALUES (?,?,?,?)",
       [body.nome, body.idade, body.email, body.senha]
     );
 
