@@ -25,7 +25,6 @@ main{
     margin: 25px;
     background-color: #ffffff;
     width: 700px;
-    height: 490px;
     box-shadow: 0px 0px 5px 0px #c6c6c6;
 }
 
@@ -35,4 +34,44 @@ main{
     width: 250px;
     height: 230px;
     box-shadow: 0px 0px 5px 0px #c6c6c6;
+}
+
+.dadosUser{
+    padding-top: 69px;
+}
+
+.categoria-logs{
+    font-size: 10px;
+    margin-bottom: 35px;
+    padding: 8px;
+    border-radius: 10px;
+    background-color: #003cff56;
+}
+
+.dadinhos{
+    background-color: #003cff25;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+button{
+    border: none;
+    background-color: transparent;
+}
+
+.card-logs{
+    margin-left: 50px;
+}
+
+.post-log{
+    margin: 15px;
+    padding: 10px;
+    border: 1px solid #cacaca;
+    border-radius: 10px;
+    background-color: #e0e0e0d5;
+}
+
+#categoria{
+    padding-top: 1px;
+    padding-bottom: 1px;
 }

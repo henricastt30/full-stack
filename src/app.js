@@ -146,12 +146,34 @@ app.get("/logs", async (req, res) => {
   const offset = pagina * quantidade
 
   const [results] = await pool.query(`
-   SELECT lgs.id, lgs.categoria, lgs.horas_trabalhadas, lgs.linhas_codigo, lgs.bugs_corrigidos, lgs.id_user, (devhub.like.id_log) AS likes FROM lgs 
-LEFT JOIN devhub.like
-ON devhub.like.id_log = devhub.lgs.id
-GROUP BY lgs.id, lgs.categoria, lgs.horas_trabalhadas, lgs.linhas_codigo, lgs.bugs_corrigidos, lgs.id_user
-ORDER BY devhub.lgs.id ASC;
-;
+    SELECT
+      lgs.id,
+        lgs.categoria,
+        lgs.horas_trabalhadas,
+        lgs.linhas_codigo,
+        lgs.bugs_corrigidos,
+        lgs.id_user,
+        usuario.nome,
+      (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
+      (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments
+    FROM
+      devhub.lgs 
+    left JOIN devhub.like
+    ON devhub.like.id_log = devhub.lgs.id
+    LEFT JOIN devhub.comment
+    ON devhub.comment.id_log = devhub.lgs.id
+    LEFT JOIN devhub.usuario
+    ON devhub.usuario.id = devhub.lgs.id_user
+    GROUP BY
+    lgs.id,
+      lgs.categoria,
+      lgs.horas_trabalhadas,
+      lgs.linhas_codigo,
+      lgs.bugs_corrigidos,
+      lgs.id_user
+    ORDER BY devhub.lgs.id asc
+      LIMIT ?
+      OFFSET ?
     `, [quantidade, offset]);
   res.send(results);
 });

@@ -30,7 +30,7 @@
 
         <section class="card-user">
             <div class="container">
-                <div class="p-5 mt-5 rounded-1">
+                <div class="mt-5 rounded-1">
                     <div class="container-fluid">
                         <div id="metricas"></div>
                     </div>
@@ -40,24 +40,13 @@
 
         <section class="card-logs">
             <div class="container">
-                <div class="p-5 mt-5 rounded-1">
+                <div class="mt-5 rounded-1">
                     <div class="conteiner-fluid">
                         <div id="categoria"></div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <section class="card-activities">
-            <div class="container">
-                <div class="p-5 mt-5 rounded-1">
-                    <div class="conteiner-fluid">
-
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 </body>
 
@@ -85,11 +74,22 @@
                     const element = data[index];
                     console.log(element.nome);
                     metricasHTML += `
-                    <div class="">
-                        Dados do Usuário: ${element.nome} <br>
-                        Horas Totais ${element.horas_totais} <br>
-                        Bugs Totais ${element.bugs_totais} <br>
-                        Logs Totais ${element.logs_totais} <br>
+                    <div class="text-center">
+                        <p class="pt-5 fw-bold">
+                            Dados do Usuário: ${element.nome} <br>
+                        </p>
+
+                        <p>
+                            Horas Totais ${element.horas_totais} <br>
+                        </p>
+
+                        <p>
+                            Bugs Totais ${element.bugs_totais} <br>
+                        </p>
+
+                        <p>
+                            Logs Totais ${element.logs_totais} <br>
+                        </p>
                     </div>
                     `;
                 }
@@ -119,15 +119,11 @@
                 for (let index = 0; index < data.length; index++) {
                     const element = data[index];
                     console.log(element.categoria);
-                    categoriasHTML += `<div style="border-radius: 4px; border: 1px #cacaca solid; padding: 20px;">
-                    Categoria: ${element.categoria} <br>
-                    <div style="display: flex; justify-content: column;">
-                        Horas Trabalhadas ${element.horas_trabalhadas}
-                        Linhas Totais de Código ${element.linhas_codigo}
-                        Bugs Corrigidos ${element.bugs_corrigidos}
-                    </div>
-                    </div>
-                    `;
+                    categoriasHTML += `<div class="post-log "> <p class='categoria'>
+                    <div class="cima-card d-flex justify-content-between"><h5>${element.nome}</h5><h6 class="categoria-logs">${element.categoria}</h6> </div>
+                    <div class='mb-3 text-center d-flex justify-content-around'> <div class="dadinhos">${element.horas_trabalhadas}h <br> <p>horas trabalhadas</p></div> <div class="dadinhos">${element.linhas_codigo} <br> <p>linhas de codigo</p> </div> <div class="dadinhos"> ${element.bugs_corrigidos}<br> <p>bugs corrigido</p> </div></div>
+                    <div class="baixo-card"> <button><img src="../elements/icons/heart.svg" alt=""> ${element.likes}</button> </button> <button> <img src="../elements/icons/comment.svg" alt=""> ${element.qnt_comments} </button></div>
+                    </div>`;
                 }
             }
             document.getElementById("categoria").innerHTML = categoriasHTML;
