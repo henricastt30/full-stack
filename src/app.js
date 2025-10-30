@@ -147,18 +147,19 @@ app.get("/logs", async (req, res) => {
 
   const [results] = await pool.query(`
     SELECT
-      lgs.id,
-        lgs.categoria,
-        lgs.horas_trabalhadas,
-        lgs.linhas_codigo,
-        lgs.bugs_corrigidos,
-        lgs.id_user,
-        usuario.nome,
-      (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
-      (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments
+    lgs.id AS log_id,
+    lgs.categoria,
+    lgs.horas_trabalhadas,
+    lgs.linhas_codigo,
+    lgs.bugs_corrigidos,
+    lgs.id_user,
+    usuario.nome,
+    usuario.id AS user_id,
+    (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
+    (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) AS qnt_comments
     FROM
-      devhub.lgs 
-    left JOIN devhub.like
+    devhub.lgs 
+    LEFT JOIN devhub.like
     ON devhub.like.id_log = devhub.lgs.id
     LEFT JOIN devhub.comment
     ON devhub.comment.id_log = devhub.lgs.id
@@ -166,14 +167,17 @@ app.get("/logs", async (req, res) => {
     ON devhub.usuario.id = devhub.lgs.id_user
     GROUP BY
     lgs.id,
-      lgs.categoria,
-      lgs.horas_trabalhadas,
-      lgs.linhas_codigo,
-      lgs.bugs_corrigidos,
-      lgs.id_user
-    ORDER BY devhub.lgs.id asc
-      LIMIT ?
-      OFFSET ?
+    lgs.categoria,
+    lgs.horas_trabalhadas,
+    lgs.linhas_codigo,
+    lgs.bugs_corrigidos,
+    lgs.id_user,
+    usuario.nome,
+    usuario.id
+    ORDER BY
+    devhub.lgs.id ASC
+    LIMIT ?
+    OFFSET ?
     `, [quantidade, offset]);
   res.send(results);
 });

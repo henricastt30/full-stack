@@ -4,17 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DevHub</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css"
         integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js"
-        integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js"
-        integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <link rel="stylesheet" href="../style/main.css">
 </head>
@@ -27,7 +21,6 @@
     </nav>
 
     <main>
-
         <section class="card-user">
             <div class="container">
                 <div class="mt-5 rounded-1">
@@ -41,95 +34,121 @@
         <section class="card-logs">
             <div class="container">
                 <div class="mt-5 rounded-1">
-                    <div class="conteiner-fluid">
+                    <div class="container-fluid">
                         <div id="categoria"></div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js"
+        integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        async function toggleLike(log_id, user_id) {
+            const botao = document.querySelector(`#like-${log_id}`);
+            if (!botao || botao.disabled) return;
+
+            botao.disabled = true;
+
+            try {
+                const res = await fetch("http://localhost:3000/likes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ log_id: log_id, user_id: user_id })
+                });
+
+                const data = await res.json();
+
+                const spanCount = botao.querySelector(".like-count");
+                if (!spanCount) return;
+
+                let newLikes = data.newLikes;
+                if (newLikes === undefined || newLikes === null) {
+                    const current = parseInt(spanCount.textContent) || 0;
+                    const isLiked = botao.classList.contains("liked");
+                    newLikes = isLiked ? current - 1 : current + 1;
+                }
+                spanCount.textContent = newLikes;
+
+                const curtido = data.curtido ?? !botao.classList.contains("liked");
+                botao.classList.toggle("liked", curtido);
+                botao.setAttribute("data-curtido", curtido);
+
+            } catch (err) {
+                console.error("Erro no like:", err);
+                const spanCount = botao.querySelector(".like-count");
+                if (spanCount) {
+                    const current = parseInt(spanCount.textContent) || 0;
+                    const isLiked = botao.classList.contains("liked");
+                    spanCount.textContent = isLiked ? current - 1 : current + 1;
+                }
+                botao.classList.toggle("liked");
+            } finally {
+                botao.disabled = false;
+            }
+        }
+
+        fetch("http://localhost:3000/metricas-usuario/1")
+            .then(r => r.json())
+            .then(data => {
+                let html = "";
+                if (Array.isArray(data)) {
+                    data.forEach(el => {
+                        html += `
+                            <div class="text-center">
+                                <p class="pt-5 fw-bold">Dados do Usuário: ${el.nome}</p>
+                                <p>Horas Totais: ${el.horas_totais}</p>
+                                <p>Bugs Totais: ${el.bugs_totais}</p>
+                                <p>Logs Totais: ${el.logs_totais}</p>
+                            </div>`;
+                    });
+                }
+                document.getElementById("metricas").innerHTML = html;
+            })
+            .catch(() => {});
+
+        fetch("http://localhost:3000/logs?pagina=1&quantidade=10")
+            .then(r => r.json())
+            .then(data => {
+                let html = "";
+                if (Array.isArray(data)) {
+                    data.forEach(el => {
+                        const curtido = el.curtido === true || el.curtido === "true" || false;
+                        html += `
+                            <div class="post-log mb-4 p-3 border rounded">
+                                <div class="cima-card d-flex justify-content-between">
+                                    <h5>${el.nome}</h5>
+                                    <h6 class="categoria-logs text-muted">${el.categoria}</h6>
+                                </div>
+                                <div class="mb-3 text-center d-flex justify-content-around">
+                                    <div class="dadinhos">${el.horas_trabalhadas}h <br><small>horas</small></div>
+                                    <div class="dadinhos">${el.linhas_codigo} <br><small>linhas</small></div>
+                                    <div class="dadinhos">${el.bugs_corrigidos} <br><small>bugs</small></div>
+                                </div>
+                                <div class="baixo-card d-flex gap-3">
+                                    <button 
+                                        id="like-${el.log_id}" 
+                                        onclick="toggleLike(${el.log_id}, ${el.user_id})"
+                                        class="btn-like d-flex align-items-center gap-1 ${curtido ? 'liked' : ''}"
+                                        data-curtido="${curtido}">
+                                        <img src="../elements/icons/heart.svg" alt="Like" width="20">
+                                        <span class="like-count">${el.likes}</span>
+                                    </button>
+                                    <button class="d-flex align-items-center gap-1 text-muted">
+                                        <img src="../elements/icons/comment.svg" alt="Comentário" width="20">
+                                        ${el.qnt_comments}
+                                    </button>
+                                </div>
+                            </div>`;
+                    });
+                }
+                document.getElementById("categoria").innerHTML = html;
+            })
+            .catch(err => console.error("Erro ao carregar logs:", err));
+    </script>
 </body>
-
-<script>
-
-    const urlMetrica = "http://localhost:3000/metricas-usuario/1"
-    fetch(urlMetrica, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-    })
-        .then((res) => {
-            if (!res.ok)
-                console.log("teste: ", res)
-            return res.json();
-        }).then((data) => {
-            if (data)
-                console.log("teste: ", data)
-
-            let metricasHTML = "";
-            if (data && Array.isArray(data)) {
-                for (let index = 0; index < data.length; index++) {
-                    const element = data[index];
-                    console.log(element.nome);
-                    metricasHTML += `
-                    <div class="text-center">
-                        <p class="pt-5 fw-bold">
-                            Dados do Usuário: ${element.nome} <br>
-                        </p>
-
-                        <p>
-                            Horas Totais ${element.horas_totais} <br>
-                        </p>
-
-                        <p>
-                            Bugs Totais ${element.bugs_totais} <br>
-                        </p>
-
-                        <p>
-                            Logs Totais ${element.logs_totais} <br>
-                        </p>
-                    </div>
-                    `;
-                }
-            }
-            document.getElementById("metricas").innerHTML = metricasHTML;
-        })
-        .catch((error) => console.log("ERROR: ", error))
-
-    const urlCategoria = "http://localhost:3000/logs?pagina=1&quantidade=10"
-    fetch(urlCategoria, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-    })
-        .then((res) => {
-            if (!res.ok)
-                console.log("teste: ", res)
-            return res.json();
-        }).then((data) => {
-            if (data)
-                console.log("teste: ", data)
-
-            let categoriasHTML = "";
-            if (data && Array.isArray(data)) {
-                for (let index = 0; index < data.length; index++) {
-                    const element = data[index];
-                    console.log(element.categoria);
-                    categoriasHTML += `<div class="post-log "> <p class='categoria'>
-                    <div class="cima-card d-flex justify-content-between"><h5>${element.nome}</h5><h6 class="categoria-logs">${element.categoria}</h6> </div>
-                    <div class='mb-3 text-center d-flex justify-content-around'> <div class="dadinhos">${element.horas_trabalhadas}h <br> <p>horas trabalhadas</p></div> <div class="dadinhos">${element.linhas_codigo} <br> <p>linhas de codigo</p> </div> <div class="dadinhos"> ${element.bugs_corrigidos}<br> <p>bugs corrigido</p> </div></div>
-                    <div class="baixo-card"> <button><img src="../elements/icons/heart.svg" alt=""> ${element.likes}</button> </button> <button> <img src="../elements/icons/comment.svg" alt=""> ${element.qnt_comments} </button></div>
-                    </div>`;
-                }
-            }
-            document.getElementById("categoria").innerHTML = categoriasHTML;
-        })
-        .catch((error) => console.log("ERROR: ", error))
-
-</script>
 
 </html>
